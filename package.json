@@ -1,28 +1,38 @@
 {
-  "name": "shopmate-backend",
-  "version": "0.0.0",
+  "name": "sms-api",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "build:prod": "babel src --out-dir dist --copy-files --ignore node_modules",
     "clean": "rm -rf dist && mkdir dist",
-    "build": "yarn run clean && yarn run build:prod",
+    "build": "npm run clean && npm run build:prod",
     "serve": "node dist/server.js",
-    "start": "NODE_ENV=production yarn run build && yarn run serve",
+    "prestart": "npm run db:migrate",
+    "start": "NODE_ENV=production npm run build && npm run serve",
     "start:dev": "NODE_ENV=development DEBUG=log nodemon --exec node --require @babel/register $NODE_DEBUG_OPTION src/server.js",
     "lint": "node_modules/.bin/eslint ./src",
-    "lint:fix": "yarn lint --fix",
-    "test": "jest --no-cache  --detectOpenHandles --runInBand --forceExit"
+    "lint:fix": "npm run lint '--fix'",
+    "test": "jest --no-cache  --detectOpenHandles --runInBand --forceExit",
+    "db:seed": "node_modules/.bin/sequelize db:seed:all",
+    "db:migrate": "node_modules/.bin/sequelize db:migrate",
+    "db:rollback": "node_modules/.bin/sequelize db:migrate:undo:all",
+    "db:rollmigrate": "npm run db:rollback && npm run db:migrate && npm run db:seed"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
+    "dotenv": "^8.1.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.2",
     "express": "~4.16.0",
     "jest": "^24.9.0",
     "morgan": "~1.9.0",
-    "node-sass-middleware": "^0.11.0",
-    "nodemon": "^1.18.11"
+    "node-sass-middleware": "0.11.0",
+    "nodemon": "^1.18.11",
+    "pg": "^7.12.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^5.15.2",
+    "sequelize-cli": "^5.4.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.3",
@@ -39,14 +49,14 @@
     "collectCoverage": true,
     "collectCoverageFrom": [
       "src/**/*.js",
-      "!src/index.js"
+      "!src/server.js"
     ],
     "testMatch": [
-      "<rootDir>/tests/**/?(*.)(spec|test).js"
+      "<rootDir>/src/**/?(*.)(spec|test).js"
     ],
     "coveragePathIgnorePatterns": [
-      "<rootDir>/src/config/database/migrations",
-      "<rootDir>/src/config/database/seeders",
+      "<rootDir>/src/database/migrations",
+      "<rootDir>/src/database/seeders",
       "<rootDir>/src/database/models/index.js"
     ],
     "testEnvironment": "node"
